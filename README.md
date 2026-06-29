@@ -3,12 +3,17 @@
 Run NVIDIA's published **GLM-5.2 accuracy axes** against **any OpenAI-compatible chat endpoint** (vLLM, SGLang, …) —
 a fast way to measure what a REAP prune / quantization costs vs the full model, without long agentic sweeps.
 
-Reference numbers (full GLM-5.2, from the `nvidia/GLM-5.2-NVFP4` model card):
+## Results
 
-| Precision | GPQA Diamond | SciCode | IFBench | τ²-Bench Telecom |
+Full-model reference is from the `nvidia/GLM-5.2-NVFP4` model card; the **REAP** row is measured *with this harness*.
+
+| Model | GPQA Diamond | SciCode | IFBench | τ²-Bench Telecom |
 |---|:-:|:-:|:-:|:-:|
-| GLM-5.2 FP8 (baseline) | 89.52 | 49.85 | 74.95 | 97.9 |
-| GLM-5.2 NVFP4 | 89.39 | 49.04 | 75.81 | 98.25 |
+| GLM-5.2 FP8 — full *(NVIDIA ref)* | 89.52 | 49.85 | 74.95 | 97.9 |
+| GLM-5.2 NVFP4 — full *(NVIDIA ref)* | 89.39 | 49.04 | 75.81 | 98.25 |
+| [**GLM-5.2-Int8Mix-NVFP4-REAP-594B**](https://huggingface.co/madeby561/GLM-5.2-Int8Mix-NVFP4-REAP-594B) · ~22% expert prune | **86.87** | — | — | — |
+
+REAP-594B GPQA Diamond: **172/198 correct, 0 errors** — within ~2.5 pts of the full model (~97% retention) despite pruning ~22% of the experts. SciCode / IFBench / τ²-Bench Telecom pending.
 
 Protocol: temperature 1.0, top_p 0.95; GPQA Diamond `max_new_tokens=100000`, others `64000`.
 
