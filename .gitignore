@@ -1,0 +1,13 @@
+# gated / large / non-redistributable data
+gpqa_diamond.csv
+*.h5
+# results
+gpqa_*.json
+# cloned official harnesses
+scicode/SciCode/
+# python
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
