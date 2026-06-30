@@ -16,12 +16,12 @@ Full-model reference is from the `nvidia/GLM-5.2-NVFP4` model card; the **REAP**
 | ↳ *intelligence lost vs full NVFP4* | **−2.8%** | **−2.6%** | — | — | — |
 | [**GLM-5.2-NVFP4-REAP-504B-term**](https://huggingface.co/madeby561/GLM-5.2-NVFP4-REAP-504B-term) · ~34% expert prune | — | 44.67 | — | — | — |
 | ↳ *intelligence lost vs full NVFP4* | — | **−8.9%** | — | — | — |
-| [0xSero/GLM-5.2-504B](https://huggingface.co/0xSero/GLM-5.2-504B) · prior-art NVFP4 REAP | 68.18 † | — | — | — | — |
+| [0xSero/GLM-5.2-504B](https://huggingface.co/0xSero/GLM-5.2-504B) · NVFP4 REAP | 68.18 † | — | — | — | — |
 | ↳ *intelligence lost vs full NVFP4* | **−23.7%** | — | — | — | — |
 
 REAP-594B GPQA Diamond: **172/198 correct, 0 errors** — within ~2.5 pts of full NVFP4 (~97% retention) despite pruning ~22% of the experts. SciCode (with-background, subproblem accuracy): **REAP-594B 47.77% (139/291)**, **REAP-504B-term 44.67% (130/291)** — both 65/65 samples, 0 errors (fully-solved problems: 594B 11/65, term 7/65). **Intelligence lost** = relative drop vs full NVFP4 (same quant → isolates the prune): the deeper 256→168 prune (term, −8.9% SciCode) costs ~3× the 256→200 prune (594B, −2.6%). IFBench / τ²-Bench Telecom pending.
 
-The prior-art **0xSero/GLM-5.2-504B** REAP scores **68.18% (135/198, 0 errors)** on the same harness/protocol. **†** Of its 198 questions, **35 (17.7%) hit the 100k-token cap (`length`) without producing an answer** — vs only **10/198 (5.1%) for REAP-594B** — so a large part of the gap is non-termination (the model thinking past the budget), not pure reasoning. The score is legitimate under the standard protocol; the footnote just flags that the termination axis is doing a lot of the work here.
+The **0xSero/GLM-5.2-504B** REAP scores **68.18% (135/198, 0 errors)** on the same harness/protocol. **†** Of its 198 questions, **35 (17.7%) hit the 100k-token cap (`length`) without producing an answer** — vs only **10/198 (5.1%) for REAP-594B** — so a large part of the gap is non-termination (the model thinking past the budget), not pure reasoning. The score is legitimate under the standard protocol; the footnote just flags that the termination axis is doing a lot of the work here.
 
 Protocol: temperature 1.0, top_p 0.95; GPQA Diamond `max_new_tokens=100000`, others `64000`.
 
