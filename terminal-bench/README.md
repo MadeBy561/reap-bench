@@ -53,6 +53,17 @@ full 89 tasks, Terminus-2, **pass@1 averaged over 3 repeats**.
 - **Local Docker** instead of AA's hosted E2B sandbox — the *tasks* are identical (same pinned sha),
   only the execution host differs.
 
+## Resuming an interrupted run
+A full 89 × 3 run takes hours — if it dies (sleep, crash, Ctrl-C), **re-run the identical command with the
+same `-o <job_dir>`** and harbor resumes. It detects the existing job, **keeps every completed trial**
+(skips it — pass *or* fail), and re-runs only the unfinished ones. Caveats:
+- **Trial-level, not episode-level.** A trial = one task × one repeat. A task that was mid-episode when killed
+  has no `result.json` → its dir is wiped and it restarts from episode 0 (no within-task checkpoint).
+- **Config must be byte-identical** — change effort/temp/`n_attempts`/task set and it refuses
+  (`cannot be resumed with a different config`). Use a new `-o` dir for a different config.
+- A completed-but-**failed** trial counts as done and is **not** re-run on resume (that's the point of the
+  3 repeats + `retry.max_retries`, which handle flakes *during* the live run).
+
 ## litellm gotcha (important)
 For `model_name: openai/<id>`, litellm **ignores** `OPENAI_API_BASE`/`OPENAI_BASE_URL` env and hits
 `api.openai.com`. You **must** also set `api_base:` inside `kwargs:` (see the template). Symptom if you miss
