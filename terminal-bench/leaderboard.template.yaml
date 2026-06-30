@@ -1,16 +1,18 @@
-# Terminal-Bench 2.1 — REAP via Terminus-2, matched to the official leaderboard methodology.
+# Terminal-Bench 2.1 — REAP via Terminus-2, matched to the Artificial Analysis methodology
+# (https://artificialanalysis.ai/evaluations/terminalbench-v2-1): full 89 tasks, Terminus-2,
+# pass@1 averaged over 3 repeats, 250-episode cap, 2h per-task agent timeout.
 # Copy this file, replace the three REPLACE-ENDPOINT spots with your OpenAI-compatible endpoint
 # (e.g. http://localhost:5001/v1), and the model id if it isn't GLM-5.2. Then:
 #   export OPENAI_API_KEY=dummy
-#   harbor run -c leaderboard.glm52-reap.yaml --timeout-multiplier 10 -o jobs/<model>
+#   harbor run -c leaderboard.glm52-reap.yaml --timeout-multiplier 6 -o jobs/<model>
 job_name: reap-tb21-terminus2
 n_concurrent_trials: 4          # wall-clock only; raise if your box keeps up
-n_attempts: 5                   # leaderboard methodology = 5 attempts/task (headline is over 5)
+n_attempts: 3                   # AA = pass@1 averaged over 3 repeats (3 trials/task; read the pass@1 stat)
 quiet: true
 retry:
     max_retries: 3
 environment:
-    type: docker                # local Docker — same pinned tasks as the hosted leaderboard runner
+    type: docker                # local Docker — same pinned tasks as AA's E2B sandbox (identical sha)
 agents:
     - name: terminus-2
       model_name: openai/GLM-5.2          # whatever id your endpoint serves
@@ -19,8 +21,10 @@ agents:
           OPENAI_API_BASE: http://REPLACE-ENDPOINT/v1
           OPENAI_BASE_URL: http://REPLACE-ENDPOINT/v1
       kwargs:
-          reasoning_effort: max           # GLM-5.2 top tier (leaderboard uses each model's top tier)
-          temperature: 1                  # leaderboard terminus-2 setting (not your serving default)
+          reasoning_effort: max           # GLM-5.2 top tier (AA runs each model at its top tier)
+          temperature: 1                  # AA terminus-2 setting (not your serving default)
+          max_turns: 250                  # AA constraint: ≤250 episodes (f.k.a. max_episodes)
+          suppress_max_turns_warning: true
           api_base: http://REPLACE-ENDPOINT/v1   # REQUIRED: litellm ignores OPENAI_API_BASE env for openai/*
           model_info:
               max_tokens: 300000

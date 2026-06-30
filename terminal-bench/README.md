@@ -27,20 +27,30 @@ The 2.1 dataset auto-pulls from Harbor Hub on first run (pinned by the `ref:` sh
    (and the model id if it isn't `GLM-5.2`).
 3. ```bash
    export OPENAI_API_KEY=dummy
-   harbor run -c leaderboard.glm52-reap.yaml --timeout-multiplier 10 -o jobs/<model>
+   harbor run -c leaderboard.glm52-reap.yaml --timeout-multiplier 6 -o jobs/<model>
    ```
 Concurrency (`n_concurrent_trials`) is wall-clock only — never affects the score. Big tasks pull large
-container images on first run; `--timeout-multiplier 10` keeps slow local boxes from timing out the agent.
+container images on first run; `--timeout-multiplier 6` keeps the per-task agent timeout near AA's 2h floor
+(see Methodology). Full 89 × 3 repeats at `max` effort is a long run — expect many hours / overnight.
 
-## Methodology (matches the leaderboard)
+## Methodology (matches Artificial Analysis)
+Mirrors the [AA TerminalBench-v2-1 protocol](https://artificialanalysis.ai/evaluations/terminalbench-v2-1):
+full 89 tasks, Terminus-2, **pass@1 averaged over 3 repeats**.
 - **Agent: Terminus-2** (the harness's reference agent), `temperature 1`.
-- **Reasoning effort = each model's top tier.** The leaderboard runs every model at its top tier
+- **Reasoning effort = each model's top tier.** AA runs every model at its top tier
   (Claude `max`, GPT `xhigh`); GLM-5.2 exposes `high`/`max`, so we use **`max`** — the faithful assumption.
-- **5 attempts/task** (`n_attempts: 5`) — the leaderboard's pass methodology; the headline number is over 5.
-  Use `n_attempts: 1` + `task_names:` for a quick head-to-head smoke on a subset.
+- **3 repeats, pass@1** (`n_attempts: 3`) — each task is run 3 times; harbor's `compute_pass_at_k`
+  reports **pass@1**, which is exactly AA's "pass@1 averaged over 3 repeats." (Read the **pass@1** stat,
+  not pass@3.) Use `n_attempts: 1` + `task_names:` for a quick head-to-head smoke on a subset.
+- **≤250 episodes** (`max_turns: 250`) — AA's episode cap (an "episode" = one review-state-then-act turn).
 - **Output cap lifted** (`max_output_tokens: 120000`) — `max` effort can think ~70k tokens before acting;
   a 40k cap silently truncates turns and tanks the score.
-- **Local Docker** instead of the leaderboard's hosted runner — the *tasks* are identical (same pinned sha),
+- **Per-task agent timeout = 2h** (AA: 7,200 s, or the task's own if longer). harbor expresses timeouts as a
+  **multiplier on each task's own** timeout (`--timeout-multiplier`), not an absolute floor — there's no single
+  `max(7200, own)` knob. Use a multiplier large enough that every task clears ~2h (`--timeout-multiplier 6`
+  is a good default for this set); AA notes these limits "predominantly limit stuck loops," so the floor
+  rarely binds on a healthy run.
+- **Local Docker** instead of AA's hosted E2B sandbox — the *tasks* are identical (same pinned sha),
   only the execution host differs.
 
 ## litellm gotcha (important)
