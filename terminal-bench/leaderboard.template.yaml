@@ -1,0 +1,40 @@
+# Terminal-Bench 2.1 — REAP via Terminus-2, matched to the official leaderboard methodology.
+# Copy this file, replace the three REPLACE-ENDPOINT spots with your OpenAI-compatible endpoint
+# (e.g. http://localhost:5001/v1), and the model id if it isn't GLM-5.2. Then:
+#   export OPENAI_API_KEY=dummy
+#   harbor run -c leaderboard.glm52-reap.yaml --timeout-multiplier 10 -o jobs/<model>
+job_name: reap-tb21-terminus2
+n_concurrent_trials: 4          # wall-clock only; raise if your box keeps up
+n_attempts: 5                   # leaderboard methodology = 5 attempts/task (headline is over 5)
+quiet: true
+retry:
+    max_retries: 3
+environment:
+    type: docker                # local Docker — same pinned tasks as the hosted leaderboard runner
+agents:
+    - name: terminus-2
+      model_name: openai/GLM-5.2          # whatever id your endpoint serves
+      env:
+          OPENAI_API_KEY: "dummy"
+          OPENAI_API_BASE: http://REPLACE-ENDPOINT/v1
+          OPENAI_BASE_URL: http://REPLACE-ENDPOINT/v1
+      kwargs:
+          reasoning_effort: max           # GLM-5.2 top tier (leaderboard uses each model's top tier)
+          temperature: 1                  # leaderboard terminus-2 setting (not your serving default)
+          api_base: http://REPLACE-ENDPOINT/v1   # REQUIRED: litellm ignores OPENAI_API_BASE env for openai/*
+          model_info:
+              max_tokens: 300000
+              max_input_tokens: 175000
+              max_output_tokens: 120000   # max effort never truncates (tops ~70k); a 40k cap tanks the score
+              input_cost_per_token: 0.0
+              output_cost_per_token: 0.0
+              litellm_provider: openai
+              mode: chat
+datasets:
+    - name: terminal-bench/terminal-bench-2-1
+      ref: "sha256:7d7bdc1cbedad549fc1140404bd4dc45e5fd0ea7c4186773687d177ad3a0699a"   # pinned 2.1 set
+      # For a quick head-to-head smoke instead of the full 89, set n_attempts: 1 above and uncomment:
+      # task_names:
+      #     - terminal-bench/kv-store-grpc
+      #     - terminal-bench/pypi-server
+      #     - terminal-bench/write-compressor
