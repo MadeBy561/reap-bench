@@ -12,18 +12,11 @@ Full-model reference is from the `nvidia/GLM-5.2-NVFP4` model card; the **REAP**
 | GLM-5.2 FP8 — full *(NVIDIA ref)* | 89.52 | 49.85 | 74.95 | 97.9 |
 | GLM-5.2 NVFP4 — full *(NVIDIA ref)* | 89.39 | 49.04 | 75.81 | 98.25 |
 | [**GLM-5.2-Int8Mix-NVFP4-REAP-594B**](https://huggingface.co/madeby561/GLM-5.2-Int8Mix-NVFP4-REAP-594B) · ~22% expert prune | **86.87** | **47.77** | — | — |
+| ↳ *intelligence lost vs full NVFP4* | **−2.8%** | **−2.6%** | — | — |
 | [**GLM-5.2-NVFP4-REAP-504B-term**](https://huggingface.co/madeby561/GLM-5.2-NVFP4-REAP-504B-term) · ~34% expert prune | — | 44.67 | — | — |
+| ↳ *intelligence lost vs full NVFP4* | — | **−8.9%** | — | — |
 
-REAP-594B GPQA Diamond: **172/198 correct, 0 errors** — within ~2.5 pts of the full model (~97% retention) despite pruning ~22% of the experts.
-
-SciCode (with-background, official `inspect_ai` scorer, subproblem accuracy): **REAP-594B 47.77% (139/291)** — only ~1.3 below full NVFP4 (49.04); **REAP-504B-term 44.67% (130/291)** — ~4.4 below, the cost of the deeper 256→168 prune. Both 65/65 samples, 0 errors (fully-solved problems: 594B 11/65, term 7/65). IFBench / τ²-Bench Telecom pending.
-
-**Intelligence lost vs full NVFP4** (relative % drop — same quant, so this isolates the *prune* cost):
-
-| Benchmark | full NVFP4 | REAP-594B (% lost) | REAP-504B-term (% lost) |
-|---|:-:|:-:|:-:|
-| GPQA Diamond | 89.39 | 86.87 (**−2.8%**) | — |
-| SciCode | 49.04 | 47.77 (**−2.6%**) | 44.67 (**−8.9%**) |
+REAP-594B GPQA Diamond: **172/198 correct, 0 errors** — within ~2.5 pts of full NVFP4 (~97% retention) despite pruning ~22% of the experts. SciCode (with-background, subproblem accuracy): **REAP-594B 47.77% (139/291)**, **REAP-504B-term 44.67% (130/291)** — both 65/65 samples, 0 errors (fully-solved problems: 594B 11/65, term 7/65). **Intelligence lost** = relative drop vs full NVFP4 (same quant → isolates the prune): the deeper 256→168 prune (term, −8.9% SciCode) costs ~3× the 256→200 prune (594B, −2.6%). IFBench / τ²-Bench Telecom pending.
 
 Protocol: temperature 1.0, top_p 0.95; GPQA Diamond `max_new_tokens=100000`, others `64000`.
 
