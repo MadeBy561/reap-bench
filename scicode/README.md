@@ -26,3 +26,13 @@ inspect eval scicode.py --model openai/your-model \
 - NVIDIA reference (full GLM-5.2): **FP8 49.85 / NVFP4 49.04** (subproblem).
 - Heavy run: 338 subproblems × generation × local code execution — budget hours; verify the exact inspect flags
   against `eval/inspect_ai/README.md` (its CLI shifts between versions).
+
+## Results (subproblem accuracy — 65 problems / 291 subproblems, with-background)
+
+| Model | subproblem | main-problem (fully solved) | run |
+|---|:-:|:-:|---|
+| [REAP-594B](https://huggingface.co/madeby561/GLM-5.2-Int8Mix-NVFP4-REAP-594B) (200 experts) | **47.77%** (139/291) | 16.92% (11/65) | 65/65, 0 errors |
+| [REAP-504B-term](https://huggingface.co/madeby561/GLM-5.2-NVFP4-REAP-504B-term) (168 experts) | **44.67%** (130/291) | 10.77% (7/65) | 65/65, 0 errors |
+| full GLM-5.2 NVFP4 / FP8 *(NVIDIA ref)* | 49.04 / 49.85 | — | — |
+
+REAP-594B lands ~1.3 pts under full NVFP4; the deeper-pruned 504B-term ~4.4 under (the cost of 256→168 vs 256→200 experts). Settings: `with_background=true`, temperature 1.0, top_p 0.95, max_tokens 64000.
