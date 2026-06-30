@@ -18,6 +18,13 @@ REAP-594B GPQA Diamond: **172/198 correct, 0 errors** — within ~2.5 pts of the
 
 SciCode (with-background, official `inspect_ai` scorer, subproblem accuracy): **REAP-594B 47.77% (139/291)** — only ~1.3 below full NVFP4 (49.04); **REAP-504B-term 44.67% (130/291)** — ~4.4 below, the cost of the deeper 256→168 prune. Both 65/65 samples, 0 errors (fully-solved problems: 594B 11/65, term 7/65). IFBench / τ²-Bench Telecom pending.
 
+**Intelligence lost vs full NVFP4** (relative % drop — same quant, so this isolates the *prune* cost):
+
+| Benchmark | full NVFP4 | REAP-594B (% lost) | REAP-504B-term (% lost) |
+|---|:-:|:-:|:-:|
+| GPQA Diamond | 89.39 | 86.87 (**−2.8%**) | — |
+| SciCode | 49.04 | 47.77 (**−2.6%**) | 44.67 (**−8.9%**) |
+
 Protocol: temperature 1.0, top_p 0.95; GPQA Diamond `max_new_tokens=100000`, others `64000`.
 
 ## Status
